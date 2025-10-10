@@ -1,0 +1,387 @@
+// VidyaLok - AI Powered Smart Library Management System
+// Prisma Schema for MongoDB
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+// User model for both students and admin
+model User {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  studentId String   @unique // Student ID for scanning
+  email     String   @unique
+  name      String
+  phone     String?
+  role      UserRole @default(STUDENT)
+  accountStatus UserAccountStatus @default(ACTIVE)
+
+  // Student specific fields
+  branch      String?
+  semester    Int?
+  yearOfStudy Int?
+  interests   String[] @default([])
+  lastLoginAt DateTime?
+  loginCount  Int       @default(0)
+
+  // Admin specific fields
+  department  String?
+  designation String?
+
+  // Authentication
+  password String
+  isActive Boolean @default(true)
+
+  // Timestamps
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  borrowings Borrowing[]
+  entryLogs  EntryLog[]
+  feedbacks  Feedback[]
+  bookRequests BookRequest[]
+  accounts   Account[]
+  sessions   Session[]
+  createdBroadcasts Broadcast[] @relation("CreatedBroadcasts")
+  broadcastReceipts BroadcastReceipt[]
+
+  @@index([role])
+  @@map("users")
+}
+
+// Book model for inventory management
+model Book {
+  id          String  @id @default(auto()) @map("_id") @db.ObjectId
+  isbn        String  @unique
+  title       String
+  author      String
+  publisher   String?
+  category    String
+  department  String // For department-wise analytics
+  description String?
+
+  // Inventory details
+  totalCopies     Int    @default(1)
+  availableCopies Int    @default(1)
+  location        String // Shelf location
+
+  // Book status
+  status    BookStatus    @default(AVAILABLE)
+  condition BookCondition @default(GOOD)
+
+  // Timestamps
+  addedAt   DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  borrowings Borrowing[]
+
+  @@map("books")
+}
+
+// Borrowing transactions
+model Borrowing {
+  id     String @id @default(auto()) @map("_id") @db.ObjectId
+  userId String @db.ObjectId
+  bookId String @db.ObjectId
+
+  // Transaction details
+  borrowDate DateTime        @default(now())
+  dueDate    DateTime
+  returnDate DateTime?
+  status     BorrowingStatus @default(BORROWED)
+
+  // Fine details
+  fineAmount Float   @default(0)
+  finePaid   Boolean @default(false)
+
+  // Relations
+  user User @relation(fields: [userId], references: [id])
+  book Book @relation(fields: [bookId], references: [id])
+
+  @@map("borrowings")
+}
+
+// Entry/Exit logs for real-time tracking
+model EntryLog {
+  id        String    @id @default(auto()) @map("_id") @db.ObjectId
+  userId    String    @db.ObjectId
+  entryTime DateTime  @default(now())
+  exitTime  DateTime?
+  duration  Int? // Duration in minutes
+  entryPoint String? @default("Main Entrance")
+  entryMethod String? @default("qr_code")
+  recordedBy String?
+  notes      String?
+
+  // Relations
+  user User @relation(fields: [userId], references: [id])
+
+  @@map("entry_logs")
+}
+
+// Live seat availability
+model SeatAvailability {
+  id             String   @id @default(auto()) @map("_id") @db.ObjectId
+  totalSeats     Int      @default(100)
+  occupiedSeats  Int      @default(0)
+  availableSeats Int      @default(100)
+  lastUpdated    DateTime @default(now())
+
+  @@map("seat_availability")
+}
+
+// Feedback and complaints
+model Feedback {
+  id       String         @id @default(auto()) @map("_id") @db.ObjectId
+  userId   String         @db.ObjectId
+  type     FeedbackType
+  subject  String
+  message  String
+  rating   Int?           @default(0)
+  status   FeedbackStatus @default(PENDING)
+  response String?
+
+  // Timestamps
+  createdAt  DateTime  @default(now())
+  resolvedAt DateTime?
+
+  // Relations
+  user User @relation(fields: [userId], references: [id])
+
+  @@map("feedbacks")
+}
+
+// Emergency broadcasts and alerts
+model Broadcast {
+  id             String            @id @default(auto()) @map("_id") @db.ObjectId
+  title          String
+  message        String
+  type           BroadcastType      @default(ANNOUNCEMENT)
+  priority       BroadcastPriority  @default(NORMAL)
+  audience       BroadcastAudience  @default(ALL)
+  audienceFilter Json?
+  targetUserIds  String[]           @default([])
+  deliveredCount Int                @default(0)
+  readCount      Int                @default(0)
+  status         BroadcastStatus    @default(SENT)
+  isActive       Boolean            @default(true)
+  scheduleAt     DateTime?
+  sentAt         DateTime?
+  expiresAt      DateTime?
+  createdAt      DateTime           @default(now())
+  updatedAt      DateTime           @updatedAt
+  createdById    String             @db.ObjectId
+
+  createdBy User @relation("CreatedBroadcasts", fields: [createdById], references: [id])
+  receipts  BroadcastReceipt[]
+
+  @@index([createdById])
+  @@map("broadcasts")
+}
+
+model BroadcastReceipt {
+  id          String    @id @default(auto()) @map("_id") @db.ObjectId
+  broadcastId String    @db.ObjectId
+  userId      String    @db.ObjectId
+  deliveredAt DateTime  @default(now())
+  readAt      DateTime?
+
+  broadcast Broadcast @relation(fields: [broadcastId], references: [id])
+  user      User      @relation(fields: [userId], references: [id])
+
+  @@unique([broadcastId, userId])
+  @@index([userId, readAt])
+  @@map("broadcast_receipts")
+}
+
+// Book requests for new additions
+model BookRequest {
+  id        String            @id @default(auto()) @map("_id") @db.ObjectId
+  userId    String            @db.ObjectId
+  requestType String          @default("book_request")
+  bookTitle String
+  author    String?
+  isbn      String?
+  reason    String
+  priority  String            @default("medium")
+  publisher String?
+  edition   String?
+  description String?
+  status    BookRequestStatus @default(PENDING)
+
+  // Admin response
+  adminNotes  String?
+  respondedAt DateTime?
+
+  // Timestamps
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id])
+
+  @@map("book_requests")
+}
+
+// System analytics data
+model Analytics {
+  id              String   @id @default(auto()) @map("_id") @db.ObjectId
+  date            DateTime @default(now())
+  totalUsers      Int      @default(0)
+  activeUsers     Int      @default(0)
+  totalBorrowings Int      @default(0)
+  totalReturns    Int      @default(0)
+  overdueBooks    Int      @default(0)
+  peakHours       String[] // Array of peak hours
+
+  // Department-wise data
+  departmentStats Json? // Flexible JSON for department statistics
+
+  @@map("analytics")
+}
+
+model Account {
+  id                String  @id @default(auto()) @map("_id") @db.ObjectId
+  userId            String  @db.ObjectId
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @map("refresh_token")
+  access_token      String? @map("access_token")
+  expires_at        Int?    @map("expires_at")
+  token_type        String? @map("token_type")
+  scope             String?
+  id_token          String? @map("id_token")
+  session_state     String? @map("session_state")
+  user              User    @relation(fields: [userId], references: [id])
+
+  @@unique([provider, providerAccountId])
+  @@map("accounts")
+}
+
+model Session {
+  id           String   @id @default(auto()) @map("_id") @db.ObjectId
+  sessionToken String   @unique
+  userId       String   @db.ObjectId
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id])
+
+  @@map("sessions")
+}
+
+model VerificationToken {
+  id         String   @id @default(auto()) @map("_id") @db.ObjectId
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+  @@map("verification_tokens")
+}
+
+// System settings for library configuration
+model SystemSetting {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  key       String   @unique // e.g., "library-settings"
+  data      Json     // Flexible JSON for all settings
+  version   Int      @default(1)
+  updatedBy String?  // Name or ID of admin who made changes
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("system_settings")
+}
+
+// Enums
+enum UserRole {
+  STUDENT
+  ADMIN
+  LIBRARIAN
+}
+
+enum BookStatus {
+  AVAILABLE
+  BORROWED
+  RESERVED
+  MAINTENANCE
+  LOST
+  DAMAGED
+}
+
+enum BookCondition {
+  EXCELLENT
+  GOOD
+  FAIR
+  POOR
+  DAMAGED
+}
+
+enum BorrowingStatus {
+  BORROWED
+  RETURNED
+  OVERDUE
+  LOST
+  RENEWED
+}
+
+enum FeedbackType {
+  COMPLAINT
+  SUGGESTION
+  TECHNICAL_ISSUE
+  BOOK_REQUEST
+  GENERAL
+}
+
+enum FeedbackStatus {
+  PENDING
+  IN_PROGRESS
+  UNDER_REVIEW
+  RESOLVED
+  CLOSED
+}
+
+enum BroadcastType {
+  ANNOUNCEMENT
+  ALERT
+  MAINTENANCE
+  EVENT
+  EMERGENCY
+}
+
+enum BroadcastPriority {
+  NORMAL
+  HIGH
+  URGENT
+}
+
+enum BroadcastAudience {
+  ALL
+  DEPARTMENT
+  ROLE
+  CUSTOM
+}
+
+enum BroadcastStatus {
+  DRAFT
+  SCHEDULED
+  SENT
+  CANCELLED
+}
+
+enum BookRequestStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  ORDERED
+  COMPLETED
+}
+
+enum UserAccountStatus {
+  ACTIVE
+  INACTIVE
+  SUSPENDED
+}
