@@ -1,6 +1,6 @@
 # VidyaLok - AI Powered Smart Library Management System
 
-![VidyaLok Logo](public/vidyalok-banner.png)
+<img width="1080" height="1080" alt="VidyaLok - Poster" src="https://github.com/user-attachments/assets/7eae2a94-e154-494f-a763-886c607faab9" />
 
 VidyaLok is a comprehensive AI-Powered Smart Library Ecosystem Management and Engagement Platform designed specifically for APSIT (A.P. Shah Institute of Technology). This system revolutionizes traditional library management with intelligent automation, real-time tracking, and personalized learning experiences.
 
@@ -180,71 +180,6 @@ vidyalok-lms/
 - Session management
 - API rate limiting
 - SQL injection protection
-
-## 🚀 Deployment
-
-### Using Vercel (Recommended)
-
-```bash
-npm run build
-vercel --prod
-```
-
-### Using Docker
-
-```bash
-docker build -t vidyalok-lms .
-docker run -p 3000:3000 vidyalok-lms
-```
-
-## 🧪 Testing
-
-```bash
-# Run all tests
-npm test
-
-# Run tests with coverage
-npm run test:coverage
-
-# Run e2e tests
-npm run test:e2e
-```
-
-## 📚 API Documentation
-
-Detailed API documentation is available at `/api/docs` when running the development server.
-
-## 🤝 Contributing
-
-1. Fork the repository
-2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
-3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to the branch (`git push origin feature/AmazingFeature`)
-5. Open a Pull Request
-
-## 📄 License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-## 🏫 About APSIT
-
-This system is specifically designed for A.P. Shah Institute of Technology, enhancing the library experience for students and providing powerful management tools for administrators.
-
-## 📞 Support
-
-For support and queries:
-
-- Email: support@vidyalok.com
-- Documentation: [docs.vidyalok.com](https://docs.vidyalok.com)
-- Issues: [GitHub Issues](https://github.com/yourusername/vidyalok-lms/issues)
-
-## 🙏 Acknowledgments
-
-- APSIT for providing the opportunity to develop this system
-- Next.js team for the excellent framework
-- Prisma team for the amazing ORM
-- All contributors and testers
-
 ---
 
 **Built with ❤️ for APSIT by the VidyaLok Team**
