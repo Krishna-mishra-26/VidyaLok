@@ -1,0 +1,214 @@
+/* Homepage Navbar Styles */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Prevent scroll jump for fixed header */
+section[id] {
+  scroll-margin-top: 80px;
+}
+
+/* Enhanced dropdown animations */
+@keyframes fadeInDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Language dropdown animation */
+.language-dropdown {
+  animation: fadeInDown 0.2s ease-out;
+}
+
+/* Mobile menu slide animation */
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.mobile-menu-enter {
+  animation: slideDown 0.3s ease-out;
+}
+
+/* Enhanced button hover effects */
+.homepage-btn {
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.homepage-btn::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.2),
+    transparent
+  );
+  transition: left 0.5s ease;
+}
+
+.homepage-btn:hover::before {
+  left: 100%;
+}
+
+/* Navigation link active indicator */
+.nav-link-active {
+  position: relative;
+}
+
+.nav-link-active::after {
+  content: '';
+  position: absolute;
+  bottom: -8px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 6px;
+  height: 6px;
+  background: linear-gradient(45deg, #3b82f6, #8b5cf6);
+  border-radius: 50%;
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+    transform: translateX(-50%) scale(1);
+  }
+  50% {
+    opacity: 0.5;
+    transform: translateX(-50%) scale(1.2);
+  }
+}
+
+/* Logo hover effect */
+.logo-hover-effect {
+  transition: all 0.3s ease;
+}
+
+.logo-hover-effect:hover {
+  transform: scale(1.05);
+}
+
+.logo-hover-effect:hover .logo-gradient {
+  background: linear-gradient(45deg, #3b82f6, #8b5cf6, #06b6d4);
+  background-size: 200% 200%;
+  animation: gradientShift 2s ease infinite;
+}
+
+@keyframes gradientShift {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+/* Contact info fade-in on mobile */
+.mobile-contact-info {
+  animation: fadeInUp 0.4s ease-out 0.2s both;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Header backdrop blur enhancement */
+.header-backdrop {
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+}
+
+/* Enhanced shadow on scroll */
+.header-scrolled {
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+  border-bottom: 1px solid rgba(59, 130, 246, 0.1);
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  section[id] {
+    scroll-margin-top: 70px;
+  }
+}
+
+/* CTA button special effects */
+.cta-button {
+  background: linear-gradient(45deg, #3b82f6, #8b5cf6);
+  position: relative;
+  overflow: hidden;
+}
+
+.cta-button::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(45deg, #1e40af, #7c3aed);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.cta-button:hover::before {
+  opacity: 1;
+}
+
+.cta-button span {
+  position: relative;
+  z-index: 1;
+}
+
+/* Navigation menu item hover effect */
+.nav-menu-item {
+  position: relative;
+  transition: all 0.3s ease;
+}
+
+.nav-menu-item::before {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  width: 0;
+  height: 2px;
+  background: linear-gradient(45deg, #3b82f6, #8b5cf6);
+  transition: all 0.3s ease;
+  transform: translateX(-50%);
+}
+
+.nav-menu-item:hover::before {
+  width: 100%;
+}
+
+.nav-menu-item:hover {
+  color: #3b82f6;
+}

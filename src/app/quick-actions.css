@@ -1,0 +1,37 @@
+/* Additional styles for Quick Action buttons */
+.quick-action-link {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  color: #1a1a1a !important;
+  background-color: #ffffff !important;
+  text-decoration: none;
+}
+
+.quick-action-link span {
+  color: #1a1a1a !important;
+  font-weight: 600 !important;
+  margin-top: 8px !important;
+}
+
+.quick-action-link svg {
+  color: #0066cc !important;
+  height: 1.5rem !important;
+  width: 1.5rem !important;
+}
+
+/* Fix for specific layout in the student dashboard */
+.student-quick-actions a[href] {
+  background: rgba(255, 255, 255, 0.95) !important;
+  color: #1a1a1a !important; 
+}
+
+/* Fix for button variants using asChild that don't inherit background properly */
+a[class*="quick-action-button"],
+button[class*="quick-action-button"] {
+  background: #ffffff !important;
+  color: #1a1a1a !important;
+}

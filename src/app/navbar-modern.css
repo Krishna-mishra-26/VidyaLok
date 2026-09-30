@@ -1,0 +1,301 @@
+/* ==============================================
+  VIDYALOK NAVBAR 2.0 - Modern, Accessible, Scalable
+  Purpose: High-traffic (2000+ users) resilient header
+  Principles: Clarity | Performance | Accessibility | Maintainability
+
+  QUICK MAINTAINER GUIDE
+  ------------------------------------------------
+  1. Role Themes:
+    .app-header.admin    = Dark / authoritative theme
+    .app-header.student  = Light / friendly theme
+    To add a new role: create .app-header.<role> and override tokens/colors.
+
+  2. Key Structural Classes:
+    .app-header   Sticky container with backdrop + shadow.
+    .nav-shell    Responsive 3‑column grid (brand | nav | utilities).
+    .primary-nav  Flex group for main navigation links.
+    .nav-link     Individual navigation link (focus + active states).
+    .right-cluster Search, notifications, user card grouping.
+    .user-card    Authenticated user identity + logout affordance.
+
+  3. Accessibility Features:
+    - Skip link (.skip-nav-link) jumps to #main (ensure each page has <main id="main">).
+    - Arrow key (Left/Right/Home/End) navigation handled in component logic.
+    - Focus rings use :focus-visible for reduced visual noise for mouse users.
+
+  4. Performance Notes:
+    - Transitions limited to transform / color / shadow for GPU friendliness.
+    - Backdrop blur kept moderate (22px) – adjust if perf concerns on low-end devices.
+
+  5. Theming & Colors:
+    Design tokens declared under :root (prefixed --nv-). Favor editing tokens
+    instead of scattering hex codes. Add new tokens if needed for consistency.
+
+  6. Mobile Behavior:
+    Media queries progressively hide search/meta and compress spacing.
+    Future: add collapsible nav for authenticated small screens (component level).
+
+  7. Adding a New Nav Item (React side):
+    - Update navItems array in Header.tsx for the role.
+    - Use an icon sized ~18px for visual rhythm.
+
+  8. Safe Customization Checklist:
+    [ ] Keep focus-visible outlines intact
+    [ ] Verify contrast ratios (WCAG AA at minimum)
+    [ ] Test keyboard traversal order
+    [ ] Confirm sticky behavior on scroll
+
+  ============================================== */
+
+:root {
+  /* Design tokens */
+  --nv-bg-light: 255 255 255;
+  --nv-bg-glass: 248 250 252;
+  --nv-line: 226 232 240;
+  --nv-shadow-rgb: 15 23 42;
+  --nv-accent-blue: 59 130 246;
+  --nv-accent-indigo: 99 102 241;
+  --nv-accent-cyan: 6 182 212;
+  --nv-accent-pink: 236 72 153;
+  --nv-accent-emerald: 16 185 129;
+  --nv-text-strong: 15 23 42;
+  --nv-text: 51 65 85;
+  --nv-text-soft: 100 116 139;
+  --nv-radius-sm: 8px;
+  --nv-radius: 12px;
+  --nv-radius-lg: 16px;
+  --nv-transition: 160ms cubic-bezier(.4,0,.2,1);
+  --nv-ring: 3px;
+}
+
+/* Root header */
+.app-header {
+  position: sticky;
+  top: 0;
+  z-index: 60;
+  background: linear-gradient(135deg, rgba(var(--nv-bg-light)/0.94) 0%, rgba(var(--nv-bg-glass)/0.88) 100%);
+  backdrop-filter: blur(22px) saturate(160%);
+  -webkit-backdrop-filter: blur(22px) saturate(160%);
+  border-bottom: 1px solid rgba(var(--nv-line)/0.6);
+  box-shadow:
+    0 1px 2px rgba(var(--nv-shadow-rgb)/0.04),
+    0 4px 14px -2px rgba(var(--nv-shadow-rgb)/0.08),
+    0 12px 32px -8px rgba(var(--nv-shadow-rgb)/0.10);
+  transition: background var(--nv-transition), box-shadow var(--nv-transition), border-color var(--nv-transition);
+  height: 70px;
+}
+
+/* Admin modifier */
+.app-header.admin {
+  background: linear-gradient(135deg,#0f172a 0%,#1e293b 60%,#1e40af 120%);
+  border-bottom-color: rgba(148 163 184 / 0.4);
+  box-shadow: 0 4px 18px -2px rgba(0 0 0 / 0.55);
+}
+
+/* Student modifier */
+.app-header.student {
+  background: linear-gradient(135deg,#ffffff 0%,#f0f9ff 55%,#fefce8 100%);
+  border-bottom-color: rgba(var(--nv-accent-blue)/0.25);
+}
+
+/* Layout grid */
+.nav-shell {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  max-width: 1580px;
+  margin: 0 auto;
+  padding: 0 clamp(1rem,4vw,2.5rem);
+  height: 100%;
+  gap: clamp(.75rem,2vw,1.75rem);
+}
+
+/* Skip link */
+.skip-nav-link {
+  position: fixed;
+  left: 50%;
+  top: 0.25rem;
+  transform: translate(-50%,-150%);
+  background: #0f172a;
+  color: white;
+  padding: .6rem 1rem;
+  border-radius: var(--nv-radius-sm);
+  font-weight: 600;
+  line-height: 1;
+  text-decoration: none;
+  z-index: 9999;
+  transition: transform var(--nv-transition), box-shadow var(--nv-transition);
+  box-shadow: 0 4px 14px -2px rgba(0 0 0 / 0.4);
+}
+.skip-nav-link:focus { transform: translate(-50%,0); outline: none; }
+
+/* Logo */
+.brand-link { display:flex; align-items:center; gap:.85rem; text-decoration:none; }
+.brand-emblem { position:relative; width:50px; height:50px; }
+.brand-gem {
+  position:relative; inset:0; width:100%; height:100%; border-radius:18px;
+  background:linear-gradient(135deg,#3b82f6 0%,#6366f1 50%,#ec4899 100%);
+  display:flex; align-items:center; justify-content:center; color:white;
+  box-shadow:0 6px 20px -4px rgba(59 130 246 / 0.45),0 0 0 1px rgba(255 255 255 / .25) inset;
+  transition: transform var(--nv-transition), box-shadow var(--nv-transition);
+}
+.brand-glow { position:absolute; inset:-4px; background:linear-gradient(135deg,#3b82f6,#6366f1,#ec4899); filter:blur(16px); opacity:.38; border-radius:22px; transition:opacity var(--nv-transition), filter var(--nv-transition); }
+.brand-link:hover .brand-gem { transform: translateY(-3px) rotate(-3deg); box-shadow:0 10px 28px -4px rgba(59 130 246 / .55),0 0 0 1px rgba(255 255 255 / .35) inset; }
+.brand-link:hover .brand-glow { opacity:.55; filter:blur(22px); }
+.brand-texts { display:flex; flex-direction:column; line-height:1.1; }
+.brand-title { font-size:1.45rem; font-weight:800; letter-spacing:-.03em; background:linear-gradient(135deg,#1e40af,#7c3aed,#db2777); -webkit-background-clip:text; background-clip:text; color:transparent; }
+.brand-sub { font-size:.65rem; font-weight:600; letter-spacing:.14em; text-transform:uppercase; color:rgb(var(--nv-text-soft)); }
+.admin .brand-title { background:linear-gradient(135deg,#93c5fd,#818cf8,#c084fc); -webkit-background-clip:text; background-clip:text; }
+.admin .brand-sub { color:#94a3b8; }
+
+/* Nav menu */
+.primary-nav { display:none; align-items:center; justify-content:space-around; font-size:.85rem; gap:.35rem; background:rgba(241 245 249 / .65); padding:.5rem; border-radius:18px; border:1px solid rgba(226 232 240 / .85); backdrop-filter:blur(14px); box-shadow:0 2px 6px -2px rgba(15 23 42 / .08); }
+@media (min-width: 768px) {
+  .primary-nav { display:flex; }
+}
+.student .primary-nav { background:rgba(240 249 255 / .7); border-color:rgba(186 230 253 / .9); }
+.admin .primary-nav { background:rgba(30 41 59 / .55); }
+
+.nav-link { --_pad-x:1.1rem; position:relative; display:flex; align-items:center; gap:.55rem; font-size:.85rem; font-weight:600; padding:.65rem var(--_pad-x); border-radius:14px; text-decoration:none; line-height:1; color:rgb(var(--nv-text)); transition: background var(--nv-transition), color var(--nv-transition), transform var(--nv-transition); outline:none; }
+.nav-link svg { width:18px; height:18px; stroke-width:2.1; color:rgb(var(--nv-text-soft)); transition:color var(--nv-transition), transform var(--nv-transition); }
+.nav-link:focus-visible { box-shadow:0 0 0 var(--nv-ring) rgba(var(--nv-accent-blue)/.25); background:rgba(255 255 255 / .9); }
+.nav-link:hover { background:rgba(255 255 255 / .95); color:rgb(var(--nv-text-strong)); }
+.nav-link:hover svg { color:var(--nv-accent-blue); transform:translateY(-1px); }
+
+.admin .nav-link { color:#cbd5e1; }
+.admin .nav-link svg { color:#94a3b8; }
+.admin .nav-link:hover { background:rgba(51 65 85 / .9); color:#f1f5f9; }
+.admin .nav-link:hover svg { color:#60a5fa; }
+
+.nav-link.active { background:linear-gradient(135deg,#e0f2fe 0%,#eef2ff 65%,#fdf2f8 100%); color:#1e3a8a; box-shadow:0 0 0 1px rgba(147 197 253 / .6),0 6px 14px -4px rgba(59 130 246 / .3); }
+.nav-link.active svg { color:#2563eb; }
+.admin .nav-link.active { background:linear-gradient(135deg,#1e3a8a,#312e81); color:#f1f5f9; box-shadow:0 0 0 1px rgba(96 165 250 / .5),0 6px 14px -4px rgba(30 58 138 / .5); }
+.admin .nav-link.active svg { color:#93c5fd; }
+
+/* Active underline bar for clearer current-location indication */
+.nav-link .active-bar { position:absolute; left:12px; right:12px; bottom:6px; height:3px; border-radius:2px; background:linear-gradient(90deg,#3b82f6,#6366f1,#ec4899); box-shadow:0 2px 6px -1px rgba(59 130 246 / .55); opacity:0; transform:translateY(4px) scaleX(.6); transition:var(--nv-transition); }
+.nav-link.active .active-bar { opacity:1; transform:translateY(0) scaleX(1); }
+.admin .nav-link .active-bar { background:linear-gradient(90deg,#60a5fa,#818cf8,#c084fc); box-shadow:0 2px 6px -1px rgba(96 165 250 / .55); }
+
+/* Right cluster spacing refinement after search removal for admin */
+.admin .right-cluster { gap:.75rem; }
+.admin .right-cluster .search-box { display:none !important; }
+
+/* === Consistency Overrides (admin) ===================================== */
+.app-header.homepage { height:72px; transition:height var(--nv-transition), background var(--nv-transition), box-shadow var(--nv-transition); }
+.app-header.homepage.scrolled { height:66px; background:rgba(255 255 255 / .9); box-shadow:0 2px 12px -4px rgba(15 23 42 / .14); border-bottom-color:rgba(var(--nv-line)/.6); }
+.app-header.homepage .primary-nav { background:transparent; box-shadow:none; padding:.25rem .4rem; }
+.app-header.homepage .nav-link { background:transparent !important; box-shadow:none !important; }
+.app-header.homepage .nav-link:hover { background:rgba(255 255 255 / .6) !important; }
+.app-header.homepage .nav-link.active { background:transparent !important; color:#0f172a; }
+.app-header.homepage .nav-link .active-bar { position:absolute; left:10px; right:10px; bottom:5px; height:3px; border-radius:2px; background:linear-gradient(90deg,#2563eb,#6366f1,#ec4899); box-shadow:0 1px 4px -1px rgba(59 130 246 / .45); opacity:0; transform:translateY(4px) scaleX(.5); transition:var(--nv-transition); }
+.app-header.homepage .nav-link.active .active-bar { opacity:1; transform:translateY(0) scaleX(1); }
+
+/* Homepage equal spacing for 5 nav buttons (requested) */
+.app-header.homepage .primary-nav {
+  flex: 1 1 auto;
+  justify-content: space-evenly;
+  align-items: center;
+  gap: 0; /* rely on space-evenly spacing */
+  border: none !important;
+  box-shadow: none !important;
+  background: transparent;
+  padding: 0 .35rem;
+  min-width: 520px;
+}
+.app-header.homepage .primary-nav .nav-link {
+  flex: 1 1 0;
+  justify-content: center;
+  text-align: center;
+  font-size:1.05rem; /* further increased font size */
+  font-weight:600;
+  line-height:1.05;
+  padding-top:.75rem;
+  padding-bottom:.75rem;
+}
+@media (max-width: 1280px) {
+  .app-header.homepage .primary-nav { min-width: 0; }
+}
+
+/* Contact cluster sizing (homepage) */
+.app-header.homepage .nav-shell > .flex.items-center.gap-6 { font-size:14px; }
+
+/* Remove heavy background on active link for admin; use only underline + subtle tint */
+.app-header.admin .nav-link { min-width:118px; } /* predict width to avoid shift */
+.app-header.admin .nav-link.active {
+  background:rgba(255 255 255 / 0.05) !important;
+  box-shadow:none !important;
+  color:#e2e8f0;
+}
+.app-header.admin .nav-link.active svg { color:#60a5fa; }
+
+/* Keep hover distinct but not causing layout jump */
+.app-header.admin .nav-link:hover { transform:translateY(-1px); }
+
+/* Ensure underline sits above background blend */
+.app-header.admin .nav-link .active-bar { bottom:5px; height:3px; }
+
+.nav-link .focus-ring { position:absolute; inset:0; border-radius:inherit; pointer-events:none; opacity:0; transform:scale(.92); transition:var(--nv-transition); background:radial-gradient(circle at 30% 20%,rgba(var(--nv-accent-blue)/.25),transparent 70%); }
+.nav-link:focus-visible .focus-ring { opacity:1; transform:scale(1); }
+
+/* Right cluster */
+.right-cluster { display:flex; align-items:center; gap:1rem; }
+.search-box { position:relative; width:clamp(180px,22vw,360px); }
+.search-box input { width:100%; border:1px solid rgba(var(--nv-line)/0.85); background:rgba(255 255 255 / .75); border-radius:14px; padding:.7rem .9rem .7rem 2.6rem; font-size:.85rem; font-weight:500; color:rgb(var(--nv-text-strong)); transition:var(--nv-transition); backdrop-filter:blur(6px); box-shadow:0 1px 2px rgba(0 0 0 / .04); }
+.search-box input::placeholder { color:rgb(var(--nv-text-soft)); font-weight:500; }
+.search-box input:focus { outline:none; border-color:rgba(var(--nv-accent-blue)/.7); background:rgba(255 255 255 / .95); box-shadow:0 0 0 3px rgba(var(--nv-accent-blue)/.25),0 6px 18px -6px rgba(var(--nv-shadow-rgb)/.15); }
+.search-box svg { position:absolute; right:.85rem; top:50%; transform:translateY(-50%); width:18px; height:18px; color:rgb(var(--nv-text-soft)); transition:var(--nv-transition); }
+.search-box input:focus + svg, .search-box:focus-within svg { color:var(--nv-accent-blue); }
+
+/* Notifications */
+.notice-btn { position:relative; border:none; background:rgba(255 255 255 /.75); border:1px solid rgba(var(--nv-line)/.85); padding:.65rem; width:42px; height:42px; display:flex; align-items:center; justify-content:center; border-radius:14px; cursor:pointer; color:rgb(var(--nv-text-soft)); transition:var(--nv-transition); backdrop-filter:blur(6px); }
+.notice-btn:hover { background:white; color:var(--nv-accent-emerald); box-shadow:0 4px 14px -4px rgba(16 185 129 / .4); border-color:var(--nv-accent-emerald); }
+.notice-badge { position:absolute; top:4px; right:4px; min-width:18px; height:18px; padding:0 5px; background:linear-gradient(135deg,#ef4444,#dc2626); color:white; border:2px solid #fff; font-size:.6rem; font-weight:700; border-radius:16px; display:flex; align-items:center; justify-content:center; line-height:1; box-shadow:0 2px 6px -1px rgba(220 38 38 / .55); }
+
+/* User card */
+.user-card { display:flex; align-items:center; gap:.75rem; padding:.45rem .85rem .45rem .45rem; border-radius:16px; background:rgba(255 255 255 /.75); border:1px solid rgba(var(--nv-line)/.85); backdrop-filter:blur(6px); transition:var(--nv-transition); }
+.user-card:hover { background:white; box-shadow:0 4px 18px -6px rgba(var(--nv-shadow-rgb)/.25),0 0 0 1px rgba(var(--nv-accent-blue)/.35); border-color:rgba(var(--nv-accent-blue)/.6); }
+.avatar { width:42px; height:42px; border-radius:14px; display:grid; place-items:center; font-weight:700; font-size:.95rem; letter-spacing:.02em; color:#fff; background:linear-gradient(135deg,#3b82f6,#6366f1,#ec4899); box-shadow:0 2px 10px -2px rgba(59 130 246 /.45),0 0 0 2px rgba(255 255 255 / .55); position:relative; }
+.user-meta { display:flex; flex-direction:column; line-height:1.1; min-width:0; }
+.user-name { font-size:.8rem; font-weight:600; color:rgb(var(--nv-text-strong)); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; letter-spacing:-.01em; }
+.user-id { font-size:.65rem; font-weight:600; color:rgb(var(--nv-text-soft)); letter-spacing:.06em; }
+.logout-btn-modern { border:none; background:transparent; padding:.5rem; border-radius:12px; cursor:pointer; display:flex; align-items:center; color:rgb(var(--nv-text-soft)); transition:var(--nv-transition); }
+.logout-btn-modern:hover { background:#fee2e2; color:#dc2626; }
+.logout-btn-modern:focus-visible { outline:none; box-shadow:0 0 0 var(--nv-ring) rgba(220 38 38 / .35); }
+
+.admin .notice-btn, .admin .user-card { background:rgba(30 41 59 /.55); border-color:rgba(71 85 105 /.75); color:#cbd5e1; }
+.admin .notice-btn:hover { background:rgba(51 65 85 /.85); color:#10b981; }
+.admin .user-card:hover { background:rgba(51 65 85 /.9); }
+.admin .user-name { color:#f1f5f9; }
+.admin .user-id { color:#94a3b8; }
+.admin .avatar { background:linear-gradient(135deg,#1e40af,#4338ca,#7e22ce); }
+.admin .logout-btn-modern:hover { background:rgba(220 38 38 /.2); color:#f87171; }
+
+/* Mobile adjustments */
+@media (max-width: 1024px) {
+  .primary-nav { display:none; }
+  .search-box { width:clamp(120px,26vw,220px); }
+  .user-meta { display:none; }
+  .nav-shell { grid-template-columns:auto 1fr auto; }
+}
+@media (max-width: 760px) {
+  .search-box { display:none; }
+  .app-header { height:64px; }
+  .brand-gem { width:44px; height:44px; }
+  .brand-title { font-size:1.25rem; }
+  .avatar { width:38px; height:38px; }
+  .notice-btn { width:40px; height:40px; }
+}
+@media (max-width: 640px) {
+  .right-cluster { gap:.55rem; }
+  .notice-btn { width:38px; height:38px; padding:.55rem; }
+}
+@media (max-width: 480px) {
+  .nav-shell { padding:0 .9rem; }
+  .brand-texts { display:flex; align-items:center; }
+  .brand-title { font-size:1.15rem; letter-spacing:-.01em; }
+  .brand-sub { display:none; }
+  .user-card { padding:.4rem; }
+  .avatar { width:36px; height:36px; }
+  .notice-btn { width:34px; height:34px; padding:.5rem; }
+}
